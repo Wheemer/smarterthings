@@ -1,0 +1,42 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Samsung Range Clock Sync",
+        "description": "Choose a Home Assistant entity that belongs to the Samsung SmartThings range.",
+        "data": {
+          "range_entity_id": "Range entity",
+          "startup_sync_enabled": "Sync after Home Assistant starts",
+          "startup_sync_delay": "Startup sync delay in minutes",
+          "nightly_sync_time": "Nightly sync time"
+        }
+      }
+    },
+    "error": {
+      "not_smartthings": "Choose an entity provided by the SmartThings integration.",
+      "no_device": "The selected entity is not linked to a Home Assistant device.",
+      "no_smartthings_identifier": "The selected device does not have a SmartThings device identifier."
+    },
+    "abort": {
+      "already_configured": "This range is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Range clock sync options",
+        "data": {
+          "range_entity_id": "Range entity",
+          "startup_sync_enabled": "Sync after Home Assistant starts",
+          "startup_sync_delay": "Startup sync delay in minutes",
+          "nightly_sync_time": "Nightly sync time"
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "no_configured_range": {
+      "message": "No Samsung range clock is configured."
+    }
+  }
+}
