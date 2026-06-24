@@ -1,4 +1,4 @@
-"""Even SmarterThings."""
+"""SmarterThings."""
 
 from __future__ import annotations
 

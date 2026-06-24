@@ -1,6 +1,6 @@
-"""Constants for Even SmarterThings."""
+"""Constants for SmarterThings."""
 
-DOMAIN = "even_smarter_things"
+DOMAIN = "smarterthings"
 
 CONF_NIGHTLY_SYNC_TIME = "nightly_sync_time"
 CONF_RANGE_ENTITY_ID = "range_entity_id"
@@ -13,4 +13,4 @@ DEFAULT_STARTUP_SYNC_ENABLED = True
 
 SERVICE_SYNC_TIME = "sync_time"
 
-SIGNAL_SYNCED = "even_smarter_things_synced"
+SIGNAL_SYNCED = "smarterthings_synced"

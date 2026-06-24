@@ -1,4 +1,4 @@
-"""Config flow for Even SmarterThings."""
+"""Config flow for SmarterThings."""
 
 from __future__ import annotations
 
@@ -91,7 +91,7 @@ def _resolve_smartthings_device_id(
 
 
 class SmartThingsRangeClockConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    """Handle a config flow for Even SmarterThings."""
+    """Handle a config flow for SmarterThings."""
 
     VERSION = 1
 
@@ -112,7 +112,7 @@ class SmartThingsRangeClockConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 await self.async_set_unique_id(smartthings_device_id)
                 self._abort_if_unique_id_configured()
                 return self.async_create_entry(
-                    title="Even SmarterThings",
+                    title="SmarterThings",
                     data={
                         CONF_DEVICE_ID: smartthings_device_id,
                         CONF_RANGE_ENTITY_ID: user_input[CONF_RANGE_ENTITY_ID],
@@ -143,7 +143,7 @@ class SmartThingsRangeClockConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
 
 class SmartThingsRangeClockOptionsFlow(config_entries.OptionsFlow):
-    """Handle options for Even SmarterThings."""
+    """Handle options for SmarterThings."""
 
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None

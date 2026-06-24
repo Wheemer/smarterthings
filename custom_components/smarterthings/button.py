@@ -1,4 +1,4 @@
-"""Button entities for Even SmarterThings."""
+"""Button entities for SmarterThings."""
 
 from __future__ import annotations
 

@@ -1,8 +1,12 @@
 # Changelog
 
+## 0.2.1
+
+- Rename repository, integration domain, and service namespace to SmarterThings.
+
 ## 0.2.0
 
-- Rename integration to Even SmarterThings.
+- Rename integration to SmarterThings.
 - Add native clock sync button entity.
 - Add clock sync status sensors.
 - Add read-only Samsung appliance diagnostic sensors.

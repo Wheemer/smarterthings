@@ -1,4 +1,4 @@
-# Even SmarterThings
+# SmarterThings
 
 Home Assistant custom integration for exposing useful Samsung SmartThings appliance features that the built-in SmartThings integration does not currently surface.
 
@@ -18,7 +18,7 @@ The longer-term goal is to expose the missing-but-useful Samsung appliance contr
 - Home Assistant with the built-in SmartThings integration already configured.
 - Samsung SmartThings appliances visible in Home Assistant.
 
-Even SmarterThings reuses Home Assistant's existing SmartThings OAuth token. It does not require a SmartThings personal access token.
+SmarterThings reuses Home Assistant's existing SmartThings OAuth token. It does not require a SmartThings personal access token.
 
 ## Installation
 
@@ -26,14 +26,14 @@ Even SmarterThings reuses Home Assistant's existing SmartThings OAuth token. It 
 
 1. Open HACS.
 2. Add this repository as a custom integration repository.
-3. Install **Even SmarterThings**.
+3. Install **SmarterThings**.
 4. Restart Home Assistant.
 5. Go to **Settings → Devices & services → Add integration**.
-6. Search for **Even SmarterThings**.
+6. Search for **SmarterThings**.
 
 ### Manual
 
-Copy `custom_components/even_smarter_things` into your Home Assistant `custom_components` directory, then restart Home Assistant.
+Copy `custom_components/smarterthings` into your Home Assistant `custom_components` directory, then restart Home Assistant.
 
 ## Setup
 
@@ -49,7 +49,7 @@ The integration resolves the underlying Home Assistant device and SmartThings de
 
 ### Range Clock
 
-Even SmarterThings creates these entities on the configured range device:
+SmarterThings creates these entities on the configured range device:
 
 - `button.*_sync_clock`
 - `sensor.*_last_clock_sync`
@@ -70,7 +70,7 @@ Samsung does not appear to expose the appliance's displayed clock as a readable 
 
 ### Appliance Diagnostics
 
-Even SmarterThings also creates diagnostic sensors from Samsung-specific SmartThings status attributes when they are scalar values and safe to display. These are attached to the same Home Assistant device as the source SmartThings appliance.
+SmarterThings also creates diagnostic sensors from Samsung-specific SmartThings status attributes when they are scalar values and safe to display. These are attached to the same Home Assistant device as the source SmartThings appliance.
 
 Examples include values under:
 
@@ -83,7 +83,7 @@ This is intentionally read-only in the first broad appliance pass.
 
 ### Appliance Power
 
-For Samsung appliances that expose `powerConsumptionReport`, Even SmarterThings creates replacement sensors attached to the appliance device:
+For Samsung appliances that expose `powerConsumptionReport`, SmarterThings creates replacement sensors attached to the appliance device:
 
 - `sensor.*_samsung_power`
 - `sensor.*_samsung_energy`
@@ -110,7 +110,7 @@ Defaults:
 Call:
 
 ```yaml
-action: even_smarter_things.sync_time
+action: smarterthings.sync_time
 data: {}
 ```
 
@@ -121,14 +121,14 @@ The service syncs all configured range clock targets.
 The repository includes an optional automation blueprint:
 
 ```text
-blueprints/automation/even_smarter_things_clock_sync.yaml
+blueprints/automation/smarterthings_clock_sync.yaml
 ```
 
 Use it when you want Home Assistant automations to press the clock sync button on startup and on a daily schedule instead of relying on the integration's built-in scheduler.
 
 ## Safety
 
-Even SmarterThings does not expose a generic arbitrary SmartThings command service. Controls should be added as explicit, reviewed entities with clear behavior.
+SmarterThings does not expose a generic arbitrary SmartThings command service. Controls should be added as explicit, reviewed entities with clear behavior.
 
 ## Development Status
 

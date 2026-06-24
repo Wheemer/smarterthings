@@ -1,11 +1,11 @@
 blueprint:
-  name: Even SmarterThings Clock Sync
-  description: Press an Even SmarterThings range clock sync button after Home Assistant starts and on a daily schedule.
+  name: SmarterThings Clock Sync
+  description: Press a SmarterThings range clock sync button after Home Assistant starts and on a daily schedule.
   domain: automation
   input:
     sync_button:
       name: Sync clock button
-      description: Button entity created by the Even SmarterThings integration.
+      description: Button entity created by the SmarterThings integration.
       selector:
         entity:
           domain: button

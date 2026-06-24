@@ -1,0 +1,12 @@
+{
+  "domain": "smarterthings",
+  "name": "SmarterThings",
+  "codeowners": [],
+  "config_flow": true,
+  "dependencies": ["smartthings"],
+  "documentation": "https://github.com/Wheemer/smarterthings",
+  "issue_tracker": "https://github.com/Wheemer/smarterthings/issues",
+  "iot_class": "cloud_push",
+  "requirements": [],
+  "version": "0.2.1"
+}
