@@ -1,0 +1,44 @@
+blueprint:
+  name: Even SmarterThings Clock Sync
+  description: Press an Even SmarterThings range clock sync button after Home Assistant starts and on a daily schedule.
+  domain: automation
+  input:
+    sync_button:
+      name: Sync clock button
+      description: Button entity created by the Even SmarterThings integration.
+      selector:
+        entity:
+          domain: button
+    startup_delay:
+      name: Startup delay
+      description: How long to wait after Home Assistant starts before syncing.
+      default:
+        minutes: 15
+      selector:
+        duration:
+    daily_time:
+      name: Daily sync time
+      default: "00:05:00"
+      selector:
+        time:
+
+mode: single
+
+trigger:
+  - platform: homeassistant
+    event: start
+    id: startup
+  - platform: time
+    at: !input daily_time
+    id: daily
+
+action:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: startup
+        sequence:
+          - delay: !input startup_delay
+  - action: button.press
+    target:
+      entity_id: !input sync_button

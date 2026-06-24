@@ -1,6 +1,6 @@
-"""Constants for Samsung SmartThings Range Clock."""
+"""Constants for Even SmarterThings."""
 
-DOMAIN = "smartthings_range_clock"
+DOMAIN = "even_smarter_things"
 
 CONF_NIGHTLY_SYNC_TIME = "nightly_sync_time"
 CONF_RANGE_ENTITY_ID = "range_entity_id"
@@ -13,3 +13,4 @@ DEFAULT_STARTUP_SYNC_ENABLED = True
 
 SERVICE_SYNC_TIME = "sync_time"
 
+SIGNAL_SYNCED = "even_smarter_things_synced"

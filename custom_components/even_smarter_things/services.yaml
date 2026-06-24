@@ -1,0 +1,4 @@
+sync_time:
+  name: Sync range clock
+  description: Syncs configured Samsung SmartThings range clock targets to Home Assistant's current local time.
+  fields: {}

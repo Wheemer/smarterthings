@@ -2,8 +2,8 @@
   "config": {
     "step": {
       "user": {
-        "title": "Samsung Range Clock Sync",
-        "description": "Choose a Home Assistant entity that belongs to the Samsung SmartThings range.",
+        "title": "Even SmarterThings",
+        "description": "Choose a Home Assistant entity that belongs to the Samsung SmartThings range used for clock sync. Additional Samsung appliance diagnostics are discovered automatically.",
         "data": {
           "range_entity_id": "Range entity",
           "startup_sync_enabled": "Sync after Home Assistant starts",
@@ -24,7 +24,7 @@
   "options": {
     "step": {
       "init": {
-        "title": "Range clock sync options",
+        "title": "Even SmarterThings options",
         "data": {
           "range_entity_id": "Range entity",
           "startup_sync_enabled": "Sync after Home Assistant starts",
@@ -36,7 +36,7 @@
   },
   "exceptions": {
     "no_configured_range": {
-      "message": "No Samsung range clock is configured."
+      "message": "No Even SmarterThings range clock target is configured."
     }
   }
 }

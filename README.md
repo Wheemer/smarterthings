@@ -1,17 +1,61 @@
-# Samsung Range Clock Sync
+# Even SmarterThings
 
-Home Assistant custom integration for keeping a Samsung SmartThings range clock in sync with Home Assistant's local time.
+Home Assistant custom integration for exposing useful Samsung SmartThings appliance features that the built-in SmartThings integration does not currently surface.
 
-This integration reuses Home Assistant's built-in SmartThings integration and its OAuth token. It does not require a SmartThings personal access token.
+The first release focuses on Samsung ranges/ovens:
 
-## Features
+- A native button entity to sync the range clock.
+- Last clock sync status sensors.
+- Replacement Samsung appliance power and energy sensors for devices that expose `powerConsumptionReport`.
+- Configurable startup and nightly clock sync.
+- A reusable automation blueprint for users who prefer automation-managed scheduling.
+- Read-only diagnostic sensors for Samsung-specific SmartThings appliance status attributes.
 
-- Config flow setup from the Home Assistant UI.
-- Select any existing SmartThings entity that belongs to the target range.
-- Sync the range clock shortly after Home Assistant starts.
-- Sync the range clock daily at a configurable time.
-- Manual `smartthings_range_clock.sync_time` service.
-- Sends the known Samsung clock command through SmartThings Cloud:
+The longer-term goal is to expose the missing-but-useful Samsung appliance controls and diagnostics for ranges, refrigerators, washers, dryers, and similar SmartThings appliances without turning the integration into an unsafe raw command launcher.
+
+## Requirements
+
+- Home Assistant with the built-in SmartThings integration already configured.
+- Samsung SmartThings appliances visible in Home Assistant.
+
+Even SmarterThings reuses Home Assistant's existing SmartThings OAuth token. It does not require a SmartThings personal access token.
+
+## Installation
+
+### HACS custom repository
+
+1. Open HACS.
+2. Add this repository as a custom integration repository.
+3. Install **Even SmarterThings**.
+4. Restart Home Assistant.
+5. Go to **Settings → Devices & services → Add integration**.
+6. Search for **Even SmarterThings**.
+
+### Manual
+
+Copy `custom_components/even_smarter_things` into your Home Assistant `custom_components` directory, then restart Home Assistant.
+
+## Setup
+
+During setup, choose a Home Assistant entity that belongs to your Samsung SmartThings range, such as:
+
+```text
+sensor.range_operating_state
+```
+
+The integration resolves the underlying Home Assistant device and SmartThings device ID from that entity. Other Samsung SmartThings appliance diagnostics are discovered from the loaded SmartThings devices and attached to their existing Home Assistant device pages.
+
+## Entities
+
+### Range Clock
+
+Even SmarterThings creates these entities on the configured range device:
+
+- `button.*_sync_clock`
+- `sensor.*_last_clock_sync`
+- `sensor.*_clock_sync_status`
+
+The clock sync command uses Samsung's known SmartThings execute endpoint:
 
 ```yaml
 component: main
@@ -22,35 +66,29 @@ arguments:
   - x.com.samsung.da.currentTime: "YYYY-MM-DDTHH:MM:SS"
 ```
 
-## Requirements
+Samsung does not appear to expose the appliance's displayed clock as a readable status attribute, so the integration can send the sync command but cannot read the display clock back.
 
-- Home Assistant with the built-in SmartThings integration already configured.
-- A Samsung range/oven visible in Home Assistant through SmartThings.
+### Appliance Diagnostics
 
-## Installation
+Even SmarterThings also creates diagnostic sensors from Samsung-specific SmartThings status attributes when they are scalar values and safe to display. These are attached to the same Home Assistant device as the source SmartThings appliance.
 
-### HACS custom repository
+Examples include values under:
 
-1. Open HACS.
-2. Add this repository as a custom integration repository.
-3. Install **Samsung Range Clock Sync**.
-4. Restart Home Assistant.
-5. Go to **Settings → Devices & services → Add integration**.
-6. Search for **Samsung Range Clock Sync**.
+- `samsungce.*`
+- `custom.*`
+- `sec.*`
+- `remoteControlStatus`
 
-### Manual
+This is intentionally read-only in the first broad appliance pass.
 
-Copy `custom_components/smartthings_range_clock` into your Home Assistant `custom_components` directory, then restart Home Assistant.
+### Appliance Power
 
-## Setup
+For Samsung appliances that expose `powerConsumptionReport`, Even SmarterThings creates replacement sensors attached to the appliance device:
 
-During setup, choose a Home Assistant entity that belongs to your SmartThings range, such as:
+- `sensor.*_samsung_power`
+- `sensor.*_samsung_energy`
 
-```text
-sensor.range_operating_state
-```
-
-The integration resolves the underlying Home Assistant device and SmartThings device ID from that entity.
+These are intended for appliances where the built-in SmartThings power entities are present but stale, stuck, or otherwise not useful.
 
 ## Options
 
@@ -72,23 +110,36 @@ Defaults:
 Call:
 
 ```yaml
-action: smartthings_range_clock.sync_time
+action: even_smarter_things.sync_time
 data: {}
 ```
 
-The service syncs all configured range clocks.
+The service syncs all configured range clock targets.
 
-## Notes
+## Blueprint
 
-Samsung does not appear to expose the range's displayed clock as a readable SmartThings status attribute. This integration can send a clock sync command, but it cannot verify the displayed clock by reading it back from the appliance.
+The repository includes an optional automation blueprint:
 
-The command used by this integration is an undocumented Samsung SmartThings appliance command. It is known to work on some Samsung ranges/ovens, but model and region support may vary.
+```text
+blueprints/automation/even_smarter_things_clock_sync.yaml
+```
+
+Use it when you want Home Assistant automations to press the clock sync button on startup and on a daily schedule instead of relying on the integration's built-in scheduler.
+
+## Safety
+
+Even SmarterThings does not expose a generic arbitrary SmartThings command service. Controls should be added as explicit, reviewed entities with clear behavior.
 
 ## Development Status
 
-Early release. The first goal is reliable range clock sync. Additional Samsung appliance diagnostics or sensors may be added later if they can be exposed cleanly and safely.
+Early release. The initial scope is:
+
+- Samsung range clock sync.
+- Safe Samsung appliance diagnostics.
+- Replacement Samsung appliance power and energy sensors.
+
+Future work may add model-specific controls for refrigerators, washers, dryers, and ranges where the SmartThings command surface can be verified.
 
 ## License
 
 MIT
-

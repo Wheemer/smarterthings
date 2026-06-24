@@ -1,4 +1,4 @@
-"""Samsung SmartThings Range Clock."""
+"""Even SmarterThings."""
 
 from __future__ import annotations
 
@@ -11,10 +11,10 @@ from pysmartthings import Capability, Command, SmartThingsError
 import voluptuous as vol
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_DEVICE_ID
+from homeassistant.const import CONF_DEVICE_ID, Platform
 from homeassistant.core import HomeAssistant, ServiceCall, callback
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
-from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.event import async_call_later, async_track_time_change
 from homeassistant.util import dt as dt_util
 
@@ -27,6 +27,7 @@ from .const import (
     DEFAULT_STARTUP_SYNC_ENABLED,
     DOMAIN,
     SERVICE_SYNC_TIME,
+    SIGNAL_SYNCED,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -45,6 +46,8 @@ class RangeClockRuntime:
 
 
 type RangeClockConfigEntry = ConfigEntry[RangeClockRuntime]
+
+PLATFORMS = [Platform.BUTTON, Platform.SENSOR]
 
 
 async def async_setup(hass: HomeAssistant, config: dict[str, Any]) -> bool:
@@ -87,6 +90,7 @@ async def async_setup_entry(
     _schedule_startup_sync(hass, runtime)
     _schedule_nightly_sync(hass, runtime)
     entry.async_on_unload(entry.add_update_listener(_async_update_listener))
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
 
 
@@ -94,6 +98,9 @@ async def async_unload_entry(
     hass: HomeAssistant, entry: RangeClockConfigEntry
 ) -> bool:
     """Unload a configured range clock."""
+    unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+    if not unload_ok:
+        return False
     for unsubscribe in entry.runtime_data.unsubscribers:
         unsubscribe()
     return True
@@ -191,6 +198,7 @@ async def _sync_range_clock(
     runtime.last_sync_at = dt_util.utcnow().isoformat()
     runtime.last_sync_reason = reason
     runtime.last_error = None
+    async_dispatcher_send(hass, SIGNAL_SYNCED, runtime.entry.entry_id)
     _LOGGER.info(
         "Synced Samsung range clock for %s (%s)",
         runtime.smartthings_device_id,
