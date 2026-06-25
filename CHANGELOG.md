@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.3.1
 
 - Trim SmarterThings back to user-facing entities: range clock sync button and appliance power/energy repair.
 - Remove clock sync status sensors from the planned entity surface.
