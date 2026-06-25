@@ -14,6 +14,7 @@ from homeassistant.components.sensor import (
     SensorEntity,
     SensorStateClass,
 )
+from homeassistant.components.recorder import history
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EntityCategory, UnitOfEnergy, UnitOfPower
 from homeassistant.core import HomeAssistant
@@ -32,6 +33,7 @@ POWER_CONSUMPTION_CAPABILITY = "powerConsumptionReport"
 POWER_CONSUMPTION_ATTRIBUTE = "powerConsumption"
 STATUS_CACHE_TTL = 5
 STALE_ENTITY_AGE = timedelta(hours=6)
+STALE_HISTORY_AGE = timedelta(days=2)
 
 
 @dataclass(frozen=True)
@@ -97,7 +99,7 @@ class SmartThingsStatusCache:
 POWER_CONSUMPTION_NUMERIC_FIELDS: dict[str, PowerConsumptionField] = {
     "power": PowerConsumptionField(
         attribute="power",
-        name="Samsung power",
+        name="Power",
         unique_suffix="samsung_power",
         device_class=SensorDeviceClass.POWER,
         native_unit=UnitOfPower.WATT,
@@ -108,7 +110,7 @@ POWER_CONSUMPTION_NUMERIC_FIELDS: dict[str, PowerConsumptionField] = {
     ),
     "energy": PowerConsumptionField(
         attribute="energy",
-        name="Samsung energy",
+        name="Energy",
         unique_suffix="samsung_energy",
         device_class=SensorDeviceClass.ENERGY,
         native_unit=UnitOfEnergy.KILO_WATT_HOUR,
@@ -136,7 +138,7 @@ async def async_setup_entry(
             status_cache = SmartThingsStatusCache(hass, device_id)
             report_path, report, _attrs = _power_consumption_report(full_device.status)
             if report:
-                replacements = _replacement_plan(hass, ha_device_id)
+                replacements = await _replacement_plan(hass, ha_device_id)
                 entities.extend(
                     _power_consumption_sensors(
                         status_cache=status_cache,
@@ -148,7 +150,7 @@ async def async_setup_entry(
                     )
                 )
 
-    async_add_entities(entities)
+    async_add_entities(entities, True)
 
 
 class PowerConsumptionNumericSensor(SensorEntity):
@@ -245,7 +247,7 @@ def _ha_device_id(hass: HomeAssistant, smartthings_device_id: str) -> str | None
     return device_entry.id if device_entry is not None else None
 
 
-def _replacement_plan(
+async def _replacement_plan(
     hass: HomeAssistant, ha_device_id: str | None
 ) -> dict[str, ReplacementInfo]:
     """Return official SmartThings measurements that should be replaced."""
@@ -265,7 +267,7 @@ def _replacement_plan(
     for kind, entity_id in official.items():
         if entity_id is None:
             replacements[kind] = ReplacementInfo(should_create=True)
-        elif _entity_is_stale_or_unavailable(hass, entity_id):
+        elif await _entity_is_stale_or_unavailable(hass, entity_id):
             replacements[kind] = ReplacementInfo(
                 should_create=True, target_entity_id=entity_id
             )
@@ -277,6 +279,7 @@ def _official_measurement_entity(
     registry: er.EntityRegistry, ha_device_id: str, kind: str
 ) -> str | None:
     """Find an official SmartThings measurement entity on the appliance."""
+    candidates: list[er.RegistryEntry] = []
     for entry in registry.entities.values():
         if (
             entry.platform != "smartthings"
@@ -285,7 +288,23 @@ def _official_measurement_entity(
             or entry.disabled_by is not None
         ):
             continue
+        candidates.append(entry)
 
+    preferred_names = {"power"} if kind == "power" else {"energy"}
+    for entry in candidates:
+        names = {
+            str(value or "").lower()
+            for value in (
+                entry.entity_id.split(".", 1)[1].rsplit("_", 1)[-1],
+                getattr(entry, "original_name", None),
+                getattr(entry, "name", None),
+                getattr(entry, "translation_key", None),
+            )
+        }
+        if names & preferred_names:
+            return entry.entity_id
+
+    for entry in candidates:
         haystack = " ".join(
             str(value or "").lower()
             for value in (
@@ -303,14 +322,42 @@ def _official_measurement_entity(
     return None
 
 
-def _entity_is_stale_or_unavailable(hass: HomeAssistant, entity_id: str) -> bool:
+async def _entity_is_stale_or_unavailable(hass: HomeAssistant, entity_id: str) -> bool:
     """Return true if an official entity should be replaced."""
     state = hass.states.get(entity_id)
     if state is None or state.state in {"unknown", "unavailable"}:
         return True
     if dt_util.utcnow() - state.last_updated > STALE_ENTITY_AGE:
         return True
-    return False
+    return await hass.async_add_executor_job(
+        _entity_history_is_stale,
+        hass,
+        entity_id,
+    )
+
+
+def _entity_history_is_stale(hass: HomeAssistant, entity_id: str) -> bool:
+    """Return true if recent history shows no useful movement."""
+    end_time = dt_util.utcnow()
+    start_time = end_time - STALE_HISTORY_AGE
+    try:
+        states = history.get_significant_states(
+            hass,
+            start_time,
+            end_time,
+            entity_ids=[entity_id],
+            significant_changes_only=False,
+            no_attributes=True,
+        ).get(entity_id, [])
+    except Exception as err:  # noqa: BLE001
+        _LOGGER.debug("Could not read history for %s: %s", entity_id, err)
+        return False
+    useful_states = {
+        state.state
+        for state in states
+        if state.state not in {"unknown", "unavailable"}
+    }
+    return len(useful_states) <= 1
 
 
 def _replace_official_entity_id(

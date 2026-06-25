@@ -8,6 +8,8 @@
 - Only create primary replacement power and energy sensors when the matching official SmartThings entity is missing, unavailable, unknown, or stale.
 - Automatically disable stale official SmartThings power and energy entities and move SmarterThings replacements onto their original entity ids.
 - Preserve disabled official entities with a `_smartthings_original` entity id suffix.
+- Use recent entity history when detecting stale official appliance power and energy sensors.
+- Disable official SmartThings second-cavity range entities when the reported second cavity has no meaningful state.
 
 ## 0.3.0
 
