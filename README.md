@@ -2,11 +2,12 @@
 
 Home Assistant custom integration for exposing useful Samsung SmartThings appliance features that the built-in SmartThings integration does not currently surface.
 
-The first release focuses on Samsung ranges/ovens:
+The current release focuses on Samsung ranges/ovens and appliance diagnostics:
 
 - A native button entity to sync the range clock.
 - Last clock sync status sensors.
 - Replacement Samsung appliance power and energy sensors for devices that expose `powerConsumptionReport`.
+- Extra Samsung appliance energy report sensors for interval, saved, persisted, and report-window values when Samsung exposes them.
 - Configurable startup and nightly clock sync.
 - A reusable automation blueprint for users who prefer automation-managed scheduling.
 - Read-only diagnostic sensors for Samsung-specific SmartThings appliance status attributes.
@@ -87,8 +88,17 @@ For Samsung appliances that expose `powerConsumptionReport`, SmarterThings creat
 
 - `sensor.*_samsung_power`
 - `sensor.*_samsung_energy`
+- `sensor.*_samsung_interval_energy`
+- `sensor.*_samsung_power_energy`
+- `sensor.*_samsung_persisted_energy`
+- `sensor.*_samsung_energy_saved`
+- `sensor.*_samsung_persisted_saved_energy`
+- `sensor.*_samsung_energy_report_start`
+- `sensor.*_samsung_energy_report_end`
 
-These are intended for appliances where the built-in SmartThings power entities are present but stale, stuck, or otherwise not useful.
+SmarterThings scans all SmartThings components for the Samsung report instead of assuming it is always under `main`. Energy-like values are converted from Samsung's Wh-style payload values to kWh for Home Assistant.
+
+These are intended for appliances where the built-in SmartThings power entities are missing, stale, stuck, or otherwise not useful. Entity availability is model-dependent. For example, some Samsung ranges do not expose `powerConsumptionReport` at all, so SmarterThings will not create power or energy sensors for those ranges.
 
 ## Options
 

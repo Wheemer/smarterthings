@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.0
+
+- Fix sensor setup for appliances that expose Samsung `powerConsumptionReport`.
+- Add per-device SmartThings status caching so extra appliance sensors share cloud fetches during the same update burst.
+- Scan all SmartThings components for Samsung power consumption reports instead of assuming `main`.
+- Add Samsung interval, power-energy, persisted-energy, saved-energy, and report-window timestamp sensors when present.
+- Keep Samsung power and energy replacement sensors attached to the existing SmartThings appliance device.
+
 ## 0.2.1
 
 - Rename repository, integration domain, and service namespace to SmarterThings.
