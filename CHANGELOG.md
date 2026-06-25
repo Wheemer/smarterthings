@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+- Trim SmarterThings back to user-facing entities: range clock sync button and appliance power/energy repair.
+- Remove clock sync status sensors from the planned entity surface.
+- Remove generic Samsung diagnostic sensors and technical energy report detail sensors from the planned entity surface.
+- Only create primary replacement power and energy sensors when the matching official SmartThings entity is missing, unavailable, unknown, or stale.
+- Automatically disable stale official SmartThings power and energy entities and move SmarterThings replacements onto their original entity ids.
+- Preserve disabled official entities with a `_smartthings_original` entity id suffix.
+
 ## 0.3.0
 
 - Fix sensor setup for appliances that expose Samsung `powerConsumptionReport`.

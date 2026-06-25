@@ -3,7 +3,7 @@
     "step": {
       "user": {
         "title": "SmarterThings",
-        "description": "Choose a Home Assistant entity that belongs to the Samsung SmartThings range used for clock sync. Additional Samsung appliance diagnostics are discovered automatically.",
+        "description": "Choose a Home Assistant entity that belongs to the Samsung SmartThings range used for clock sync. Samsung appliance power repair is discovered automatically.",
         "data": {
           "range_entity_id": "Range entity",
           "startup_sync_enabled": "Sync after Home Assistant starts",
