@@ -6,8 +6,8 @@
 - Remove clock sync status sensors from the planned entity surface.
 - Remove generic Samsung diagnostic sensors and technical energy report detail sensors from the planned entity surface.
 - Only create primary replacement power and energy sensors when the matching official SmartThings entity is missing, unavailable, unknown, or stale.
-- Automatically disable stale official SmartThings power and energy entities and move SmarterThings replacements onto their original entity ids.
-- Preserve disabled official entities with a `_smartthings_original` entity id suffix.
+- Automatically disable stale official SmartThings power and energy entities while preserving their original entity ids.
+- Let SmarterThings replacement entities use Home Assistant's normal suffixed entity ids with clean friendly names.
 - Use recent entity history when detecting stale official appliance power and energy sensors.
 - Disable official SmartThings second-cavity range entities when the reported second cavity has no meaningful state.
 

@@ -196,13 +196,12 @@ class PowerConsumptionNumericSensor(SensorEntity):
         self._attr_extra_state_attributes = attrs
 
     async def async_added_to_hass(self) -> None:
-        """Take over stale official SmartThings entity id if requested."""
+        """Disable stale official SmartThings entity if requested."""
         if self.replacement.target_entity_id is None:
             return
-        _replace_official_entity_id(
+        _disable_official_entity(
             self.hass,
             stale_entity_id=self.replacement.target_entity_id,
-            replacement_entity_id=self.entity_id,
         )
 
 
@@ -360,51 +359,24 @@ def _entity_history_is_stale(hass: HomeAssistant, entity_id: str) -> bool:
     return len(useful_states) <= 1
 
 
-def _replace_official_entity_id(
-    hass: HomeAssistant, stale_entity_id: str, replacement_entity_id: str
-) -> None:
-    """Disable stale official entity and move replacement onto its entity id."""
-    if stale_entity_id == replacement_entity_id:
-        return
-
+def _disable_official_entity(hass: HomeAssistant, stale_entity_id: str) -> None:
+    """Disable stale official entity while preserving its entity id."""
     registry = er.async_get(hass)
     stale_entry = registry.async_get(stale_entity_id)
-    replacement_entry = registry.async_get(replacement_entity_id)
-    if stale_entry is None or replacement_entry is None:
-        return
-    if stale_entry.disabled_by is not None:
+    if stale_entry is None or stale_entry.disabled_by is not None:
         return
 
-    backup_entity_id = _backup_entity_id(registry, stale_entity_id)
     try:
         registry.async_update_entity(
             stale_entity_id,
-            new_entity_id=backup_entity_id,
             disabled_by=er.RegistryEntryDisabler.INTEGRATION,
-        )
-        registry.async_update_entity(
-            replacement_entity_id,
-            new_entity_id=stale_entity_id,
         )
     except (KeyError, ValueError) as err:
         _LOGGER.warning(
-            "Could not replace stale SmartThings entity %s with %s: %s",
+            "Could not disable stale SmartThings entity %s: %s",
             stale_entity_id,
-            replacement_entity_id,
             err,
         )
-
-
-def _backup_entity_id(registry: er.EntityRegistry, entity_id: str) -> str:
-    """Return an unused backup entity id for a disabled official entity."""
-    domain, object_id = entity_id.split(".", 1)
-    base = f"{domain}.{object_id}_smartthings_original"
-    candidate = base
-    index = 2
-    while registry.async_get(candidate) is not None:
-        candidate = f"{base}_{index}"
-        index += 1
-    return candidate
 
 
 def _power_consumption_report(
